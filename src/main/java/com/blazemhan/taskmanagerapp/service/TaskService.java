@@ -13,10 +13,12 @@ public class TaskService {
 
 
     private final TaskRepository taskRepository;
+    private final NotificationService notificationService;
 
-    public TaskService(TaskRepository taskRepository) {
+    public TaskService(TaskRepository taskRepository, NotificationService notificationService) {
 
         this.taskRepository = taskRepository;
+        this.notificationService = notificationService;
     }
     public Task createTask(Task task) {
         task.setStatus(TaskStatus.PENDING);
@@ -41,9 +43,22 @@ public class TaskService {
             throw new RuntimeException("Only completed tasks can be approved or rejected.");
         }
 
+
         task.setStatus(TaskStatus.APPROVED);
         task.setUpdatedAt(LocalDateTime.now());
-        return taskRepository.save(task);
+         taskRepository.save(task);
+
+        // Send Email Notification
+        String email = task.getAssignedTo().getEmail();
+        String subject = "✅ Task Approved: " + task.getTitle();
+        String message = "Dear " + task.getAssignedTo().getName() + ",<br><br>" +
+                "Your task <strong>'" + task.getTitle() + "'</strong> has been <strong>APPROVED</strong> by the manager.<br>" +
+                "You can now proceed with the next steps.<br><br>" +
+                "Best Regards,<br>Task Management System";
+
+        notificationService.sendTaskNotification(email, subject, message);
+
+        return task;
     }
 
     public Task rejectTask(Long taskId) {
@@ -54,7 +69,17 @@ public class TaskService {
 
         task.setStatus(TaskStatus.REJECTED);
         task.setUpdatedAt(LocalDateTime.now());
-        return taskRepository.save(task);
+         taskRepository.save(task);
+        String email = task.getAssignedTo().getEmail();
+        String subject = "❌ Task Rejected: " + task.getTitle();
+        String message = "Dear " + task.getAssignedTo().getName() + ",<br><br>" +
+                "Your task <strong>'" + task.getTitle() + "'</strong> has been <strong>REJECTED</strong> by the manager.<br>" +
+                "Please review the feedback and resubmit if necessary.<br><br>" +
+                "Best Regards,<br>Task Management System";
+
+        notificationService.sendTaskNotification(email, subject, message);
+
+        return task;
 
     }
 
