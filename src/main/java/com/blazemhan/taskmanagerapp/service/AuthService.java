@@ -33,7 +33,7 @@ public class AuthService {
 
         user = userRepository.save(user);
 
-        return "User saved successfully";
+        return "User registered successfully";
 
     }
 

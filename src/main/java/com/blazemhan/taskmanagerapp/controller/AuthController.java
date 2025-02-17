@@ -2,6 +2,7 @@ package com.blazemhan.taskmanagerapp.controller;
 
 import com.blazemhan.taskmanagerapp.model.User;
 import com.blazemhan.taskmanagerapp.service.AuthService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +20,7 @@ public class AuthController {
     }
         @PostMapping("/register")
         public ResponseEntity<String> register(@RequestBody User user){
-            return ResponseEntity.ok(authService.register(user));
+            return new  ResponseEntity<>(authService.register(user), HttpStatus.CREATED);
         }
 
 
